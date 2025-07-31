@@ -6,7 +6,7 @@
 /*   By: jhapke <jhapke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 14:33:55 by jhapke            #+#    #+#             */
-/*   Updated: 2025/07/30 15:51:58 by jhapke           ###   ########.fr       */
+/*   Updated: 2025/07/31 10:16:01 by jhapke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 write the following function:
 
-    int    ft_popen(const char file, char const *argv[], char type)
+    int    ft_popen(const char *file, char *const *argv, char type)
 
 The function must launch the executable file with the arguments argv (using execvp).
 If the type is 'r' the function must return a file descriptor connected to the output of the command.
@@ -40,7 +40,7 @@ Hint: Do not leak file descriptors! */
 #include <fcntl.h>
 #include <string.h>
 
-int	ft_popen(const char file, char const **argv, char type)
+int	ft_popen(const char *file, char *const *argv, char type)
 {
 	int		fd[2];
 	pid_t	pid;
@@ -51,7 +51,11 @@ int	ft_popen(const char file, char const **argv, char type)
 		exit(1);
 	pid = fork();
 	if (pid < 0)
+	{
+		close(fd[0]);
+		close(fd[1]);
 		exit(1);
+	}
 	if (pid == 0)
 	{
 		if (type == 'r')
@@ -80,15 +84,51 @@ int	ft_popen(const char file, char const **argv, char type)
 		return (fd[0]);
 	}
 }
+/*
+use cases for read:
+- ./a.out read echo hello
+- ./a.out read ls
+- ./a.out read cat /etc/passwd
+- ./a.out read nonexistent_cmd -> correct behaviour -> return read: 0
 
-int main()
+use cases for read:
+- ./a.out write cat hello
+- ./a.out write wc -w
+- ./a.out grep "z"
+*/
+int	main(int ac, char *const *av)
 {
-	//int fd = open("texte", O_RDONLY);
-	int fd = ft_popen("ls", (char *const[]){"ls", NULL}, 'r');
+	char	buf[1];
+	int		bytes;
+	int		fd;
+	char	c;
 
-	char buf[1];
-	while(read(fd, buf, 1))
-		write(1, buf, 1);
+	if (ac < 2)
+	{
+		printf("usage: ./program [read/write] [command] [whatever] ...");
+		return (1);
+	}
+	if (strncmp("read", av[1], 4) == 0)
+		c = 'r';
+	else if (strncmp("write", av[1], 5) == 0)
+		c = 'w';
+	else
+		c = 'a';
+	fd = ft_popen((const char *)av[2], av + 2, c);
+	printf("fd = %i\n", fd);
+	if (c == 'r')
+	{
+		while (1)
+		{
+			bytes = read(fd, buf, 1);
+			printf("read returns: %d\n", bytes);
+			if (bytes <= 0)
+				break ;
+			write(1, buf, 1);
+		}
+	}
+	else if (c == 'w')
+		write(fd, "Hallo Test\n", 11);
 	close(fd);
 	return (0);
 }
