@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   picoshell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: johnhapke <johnhapke@student.42.fr>        +#+  +:+       +#+        */
+/*   By: jhapke <jhapke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 10:17:58 by jhapke            #+#    #+#             */
-/*   Updated: 2025/08/01 12:39:02 by johnhapke        ###   ########.fr       */
+/*   Updated: 2025/08/03 14:33:34 by jhapke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,18 @@ Write the following function:
 int    picoshell(char **cmds[]);
 
 The goal of this function is to execute a pipeline. It must execute each
-commands [sic] of cmds and connect the output of one to the input of the
+commands of cmds and connect the output of one to the input of the
 next command (just like a shell).
 
-Cmds contains a null-terminated list of valid commands. Each rows [sic]
+Cmds contains a null-terminated list of valid commands. Each rows
 of cmds are an argv array directly usable for a call to execvp. The first
-arguments [sic] of each command is the command name or path and can be passed
+arguments of each command is the command name or path and can be passed
 directly as the first argument of execvp.
 
-If any error occur [sic], The function must return 1 (you must of course
+If any error occur, The function must return 1 (you must of course
 close all the open fds before). otherwise the function must wait all child
 processes and return 0. You will find in this directory a file main.c which
-contain [sic] something to help you test your function.
+contain something to help you test your function.
 
 
 Examples: 
@@ -132,40 +132,3 @@ int	picoshell(char **cmds[])
 	}
 	return (0);
 }
-
-/*int	main(void)
-{
-	int	res;
-
-	printf("test1:");
-	char *cmd1[] = {"ls", NULL};
-	char *cmd2[] = {"grep", "picoshell", NULL};
-	char **cmds1[] = {cmd1, cmd2, NULL};
-	res = picoshell(cmds1);
-	printf("\ntest2:");
-	char *cmd3[] = {"ls", "-l", NULL};
-	char **cmds2[] = {cmd3, NULL};
-	res = picoshell(cmds2);
-	printf("\ntest3:");
-	char *cmd4[] = {"echo", "hello world", NULL};
-	char *cmd5[] = {"cat", NULL};
-	char *cmd6[] = {"wc", "-w", NULL};
-	char **cmds3[] = {cmd4, cmd5, cmd6, NULL};
-	res = picoshell(cmds3);
-	printf("\ntest4:");
-	char *cmd7[] = {"/bin/ls", NULL};
-	char *cmd8[] = {"/usr/bin/grep", "picoshell", NULL};
-	char **cmds4[] = {cmd7, cmd8, NULL};
-	res = picoshell(cmds4);
-	printf("\ntest5:");
-	char *cmd9[] = {"echo", "test123", NULL};
-	char *cmd10[] = {"cat", NULL};
-	char **cmds5[] = {cmd9, cmd10, NULL};
-	res = picoshell(cmds5);
-	printf("\ntest6:");
-	char *cmd11[] = {"ls", NULL};
-	char *cmd12[] = {"wc", "-l", NULL};
-	char **cmds6[] = {cmd11, cmd12, NULL};
-	res = picoshell(cmds6);
-	return (res);
-}*/
