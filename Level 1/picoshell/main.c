@@ -6,7 +6,7 @@
 /*   By: jhapke <jhapke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/03 14:33:51 by jhapke            #+#    #+#             */
-/*   Updated: 2025/08/03 15:38:22 by jhapke           ###   ########.fr       */
+/*   Updated: 2025/08/07 11:09:40 by jhapke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 int	picoshell(char **cmds[]);
 
@@ -33,22 +34,26 @@ int	main(int ac, char **av)
 	cmds = malloc(100 * sizeof(char **));
 	if (!cmds)
 		return (1);
-	while (av[i])
+	while (i < ac)
 	{
 		start = i;
-		while (av[i + 1] && strcmp(av[i], "|") != 0)
+		while (i < ac && strcmp(av[i], "|") != 0)
 			i++;
-		cmds[count_array] = malloc((i - count_cmds) * sizeof(char *));
+		cmds[count_array] = malloc((i - start + 1) * sizeof(char *));
 		if(!cmds[count_array])
 			return (1);
-		cmds[count_array][i - count_cmds] = NULL;
 		count_cmds = 0;
-		while (start <= i)
+		while (start < i)
 			cmds[count_array][count_cmds++] = av[start++];
+		cmds[count_array][count_cmds] = NULL;
 		count_array++;
-		i++;
+		if (i < ac && strcmp(av[i], "|") == 0)
+			i++;
 	}
+	cmds[count_array] = NULL;
 	result = picoshell(cmds);
+	if (result)
+   		perror("picoshell");
 	i = 0;
 	while (i < count_array)
 		free(cmds[i++]);

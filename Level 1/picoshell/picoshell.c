@@ -6,7 +6,7 @@
 /*   By: jhapke <jhapke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 10:17:58 by jhapke            #+#    #+#             */
-/*   Updated: 2025/08/03 14:33:34 by jhapke           ###   ########.fr       */
+/*   Updated: 2025/08/07 11:22:23 by jhapke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	picoshell(char **cmds[])
 		if (cmds[i + 1] != NULL)
 		{
 			if (pipe(fd) < 0)
-				exit(1);
+				return (1);
 		}
 		pid = fork();
 		if (pid < 0)
@@ -76,36 +76,23 @@ int	picoshell(char **cmds[])
 				if (prev_fd != -1)
 					close(prev_fd);
 			}
-			exit(1);
+			return (1);
 		}
 		if (pid == 0)
 		{
-			if (i != 0)
+			if (prev_fd != -1)
+			{
 				if (dup2(prev_fd, STDIN_FILENO) == -1)
-				{
-					if (cmds[i + 1] != NULL)
-					{
-						close(fd[0]);
-						close(fd[1]);
-						if (prev_fd != -1)
-							close(prev_fd);
-					}
-					exit(1);
-				}
+						exit(1);
+					close(prev_fd);
+			}
 			if (cmds[i + 1] != NULL)
 			{
-				if (dup2(fd[1], STDOUT_FILENO) == -1)
-				{
-					close(fd[0]);
-					close(fd[1]);
-					if (prev_fd != -1)
-						close(prev_fd);
-					exit(1);
-				}
 				close(fd[0]);
-			}
-			if (fd[1] != -1)
+				if (dup2(fd[1], STDOUT_FILENO) == -1)
+					exit(1);
 				close(fd[1]);
+			}
 			execvp(cmds[i][0], cmds[i]);
 			exit(1);
 		}
@@ -127,7 +114,7 @@ int	picoshell(char **cmds[])
 			if (WEXITSTATUS(status) != 0)
 			return (1);
 		}
-		else
+		else if (WIFSIGNALED(status))
 			return (1);
 	}
 	return (0);
