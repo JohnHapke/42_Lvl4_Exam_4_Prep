@@ -6,7 +6,7 @@
 /*   By: johnhapke <johnhapke@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 14:33:55 by jhapke            #+#    #+#             */
-/*   Updated: 2025/10/29 06:47:39 by johnhapke        ###   ########.fr       */
+/*   Updated: 2025/10/30 11:35:03 by johnhapke        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,15 @@ int	ft_popen(const char *file, char *const *argv, char type)
 		if (type == 'r')
 		{
 			close(fd[0]);
-			dup2(fd[1], STDOUT_FILENO);
+			if (dup2(fd[1], STDOUT_FILENO) == -1)
+				exit(1);
 			close(fd[1]);
 		}
 		else
 		{
 			close(fd[1]);
-			dup2(fd[0], STDIN_FILENO);
+			if (dup2(fd[0], STDIN_FILENO) == -1)
+				exit(1);
 			close(fd[0]);
 		}
 		execvp(file, argv);
@@ -51,13 +53,13 @@ int	ft_popen(const char *file, char *const *argv, char type)
 	}
 	else
 	{
-		if (type == 'w')
+		if (type == 'r')
 		{
-			close(fd[0]);
-			return (fd[1]);
+			close(fd[1]);
+			return (fd[0]);
 		}
-		close(fd[1]);
-		return (fd[0]);
+		close(fd[0]);
+		return (fd[1]);
 	}
 }
 /*

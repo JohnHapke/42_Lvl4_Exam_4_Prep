@@ -6,7 +6,7 @@
 /*   By: johnhapke <johnhapke@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 10:17:58 by jhapke            #+#    #+#             */
-/*   Updated: 2025/10/29 06:46:18 by johnhapke        ###   ########.fr       */
+/*   Updated: 2025/10/30 11:54:47 by johnhapke        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,24 +67,27 @@ int	picoshell(char **cmds[])
 		}
 		else
 		{
-			if (prev_fd != -1)
-				close(prev_fd);
 			if (cmds[i + 1] != NULL)
 			{
+				if (prev_fd != -1)
+					close(prev_fd);
 				prev_fd = fd[0];
 				close(fd[1]);
 			}
+			if (prev_fd != -1)
+				close(prev_fd);
 		}
 	}
+	int error = 0;
 	while (wait(&status) > 0)
 	{
 		if (WIFEXITED(status))
 		{
 			if (WEXITSTATUS(status) != 0)
-			return (1);
+			error = 1;
 		}
 		else if (WIFSIGNALED(status))
-			return (1);
+			error = 1;
 	}
-	return (0);
+	return (error);
 }
