@@ -6,7 +6,7 @@
 /*   By: johnhapke <johnhapke@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 10:17:58 by jhapke            #+#    #+#             */
-/*   Updated: 2025/10/30 11:54:47 by johnhapke        ###   ########.fr       */
+/*   Updated: 2025/11/03 07:57:37 by johnhapke        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ int	picoshell(char **cmds[])
 	int		i;
 	pid_t	pid;
 	int		prev_fd;
-	int		status;
 
 	i = -1;
 	prev_fd = -1;
@@ -42,9 +41,9 @@ int	picoshell(char **cmds[])
 			{
 				close(fd[0]);
 				close(fd[1]);
-				if (prev_fd != -1)
-					close(prev_fd);
 			}
+			if (prev_fd != -1)
+					close(prev_fd);
 			return (1);
 		}
 		if (pid == 0)
@@ -65,29 +64,16 @@ int	picoshell(char **cmds[])
 			execvp(cmds[i][0], cmds[i]);
 			exit(1);
 		}
-		else
-		{
-			if (cmds[i + 1] != NULL)
-			{
-				if (prev_fd != -1)
-					close(prev_fd);
-				prev_fd = fd[0];
-				close(fd[1]);
-			}
-			if (prev_fd != -1)
+		if (prev_fd != -1)
 				close(prev_fd);
-		}
-	}
-	int error = 0;
-	while (wait(&status) > 0)
-	{
-		if (WIFEXITED(status))
+		if (cmds[i + 1] != NULL)
 		{
-			if (WEXITSTATUS(status) != 0)
-			error = 1;
+			prev_fd = fd[0];
+			close(fd[1]);
 		}
-		else if (WIFSIGNALED(status))
-			error = 1;
+		else
+			prev_fd = -1;
 	}
-	return (error);
+	while (wait(NULL) > 0)
+	return (0);
 }
